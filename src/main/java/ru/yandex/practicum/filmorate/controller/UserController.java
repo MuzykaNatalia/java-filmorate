@@ -20,6 +20,7 @@ public class UserController {
     public ResponseEntity<User> getUserById(@PathVariable Long id) {
         return ResponseEntity.status(HttpStatus.OK).body(userService.checkUserExistenceAndGetUserById(id));
     }
+
     @GetMapping
     public ResponseEntity<Collection<User>> getAllUsers() {
         return ResponseEntity.status(HttpStatus.OK).body(userService.getAllUsers());

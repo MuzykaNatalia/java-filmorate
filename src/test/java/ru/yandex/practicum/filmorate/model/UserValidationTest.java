@@ -91,7 +91,7 @@ public class UserValidationTest {
     @DisplayName("Должен вернуть код ошибки 400 при наличии в логине пользователя пробела")
     @Test
     public void shouldReturnAnErrorCode400ForALoginContainingASpace() throws Exception {
-        User user = new User( "a@yandex.ru", "k k", "Anita",
+        User user = new User("a@yandex.ru", "k k", "Anita",
                 LocalDate.of(2000, 12, 15));
         mockMvc.perform(post("/users")
                         .content(objectMapper.writeValueAsString(user))
