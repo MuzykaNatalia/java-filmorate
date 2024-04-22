@@ -27,7 +27,7 @@ public class FilmStorageDbImpl implements FilmStorage {
             "WHERE film_id = :filmId";
     protected final String sqlSelectAllFilms = "SELECT f.*, r.name AS rating_name FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
-            "GROUP BY film_id";
+            "GROUP BY film_id, rating_name";
     protected final String sqlSelectGenresAllFilms = "SELECT f.*, g.name " +
             "FROM film_genre AS f " +
             "JOIN genre AS g ON f.genre_id = g.genre_id";
@@ -36,14 +36,9 @@ public class FilmStorageDbImpl implements FilmStorage {
             "FROM film AS f " +
             "LEFT JOIN rating AS r ON f.rating_id = r.rating_id " +
             "LEFT JOIN favorite_film AS l ON f.film_id = l.film_id " +
-            "WHERE f.film_id IN (" +
-            "SELECT fm.film_id FROM film AS fm " +
-            "LEFT JOIN favorite_film AS ff ON fm.film_id = ff.film_id " +
-            "GROUP BY fm.film_id " +
-            "ORDER BY COUNT(fm.film_id) DESC " +
-            "LIMIT :count) " +
-            "GROUP by f.film_id, rating_name " +
-            "ORDER BY count_likes DESC";
+            "GROUP BY f.film_id, rating_name " +
+            "ORDER BY COUNT(l.user_id) DESC " +
+            "LIMIT :count";
     protected final String sqlSelectAllGenes = "SELECT * FROM genre ORDER BY genre_id";
     protected final String sqlSelectAllRatingMpa = "SELECT * FROM rating ORDER BY rating_id";
     protected final String sqlSelectToOneGenre = "SELECT * FROM genre WHERE genre_id = :genreId";
@@ -66,12 +61,12 @@ public class FilmStorageDbImpl implements FilmStorage {
             "SELECT fm.film_id FROM film AS fm " +
             "LEFT JOIN favorite_film AS ff ON fm.film_id = ff.film_id " +
             "GROUP BY fm.film_id " +
-            "ORDER BY COUNT(fm.film_id) DESC " +
+            "ORDER BY COUNT(ff.film_id) DESC, fm.film_id " +
             "LIMIT :count) " +
             "GROUP BY f.film_id, f.genre_id, g.name";
 
     @Override
-    public Film getFilmsById(Integer id) {
+    public Film getFilmsById(Long id) {
         Map<String, Object> params = Map.of("filmId", id);
         List<Film> film = parameter.query(sqlSelectOneFilm, params, new FilmMapper());
 
@@ -79,7 +74,7 @@ public class FilmStorageDbImpl implements FilmStorage {
             return null;
         }
 
-        Map<Integer, List<Genre>> genres = parameter.query(sqlSelectGenresToOneFilm, params, new GenreFromFilmMapper());
+        Map<Long, List<Genre>> genres = parameter.query(sqlSelectGenresToOneFilm, params, new GenreFromFilmMapper());
         setGenresFilms(film, genres);
         return film.get(0);
     }
@@ -89,13 +84,13 @@ public class FilmStorageDbImpl implements FilmStorage {
         List<Film> films = parameter.query(sqlSelectAllFilms, new FilmMapper());
 
         if (!films.isEmpty()) {
-            Map<Integer, List<Genre>> genres = parameter.query(sqlSelectGenresAllFilms, new GenreFromFilmMapper());
+            Map<Long, List<Genre>> genres = parameter.query(sqlSelectGenresAllFilms, new GenreFromFilmMapper());
             films = setGenresFilms(films, genres);
         }
         return films;
     }
 
-    private List<Film> setGenresFilms(List<Film> films, Map<Integer, List<Genre>> genres) {
+    private List<Film> setGenresFilms(List<Film> films, Map<Long, List<Genre>> genres) {
         if (genres != null) {
             return films.stream()
                     .map(film -> {
@@ -115,7 +110,7 @@ public class FilmStorageDbImpl implements FilmStorage {
         List<Film> films = parameter.query(sqlSelectPopularsFilms, params, new FilmMapper());
 
         if (!films.isEmpty()) {
-            Map<Integer, List<Genre>> genres = parameter.query(sqlSelectPopularFilmsGenres, params,
+            Map<Long, List<Genre>> genres = parameter.query(sqlSelectPopularFilmsGenres, params,
                     new GenreFromFilmMapper());
 
             films = setGenresFilms(films, genres);
@@ -154,20 +149,21 @@ public class FilmStorageDbImpl implements FilmStorage {
                 .usingGeneratedKeyColumns("film_id");
 
         Map<String, Object> params = getFilmParams(film);
-        film.setId(insertFilm.executeAndReturnKey(params).intValue());
+        film.setId(insertFilm.executeAndReturnKey(params).longValue());
         updateGenre(film);
         return getFilmsById(film.getId());
     }
 
     private Map<String, Object> getFilmParams(Film film) {
         return Map.of("name", film.getName(), "description", film.getDescription(),
-                "release_date", film.getReleaseDate().toString(), "duration", film.getDuration(),
-                "rating_id", film.getMpa().getId(), "filmId", film.getId());
+                "release_date", film.getReleaseDate(), "duration", film.getDuration(),
+                "rating_id", film.getMpa().getId());
     }
 
     @Override
     public Film updateFilm(Film film) {
-        Map<String, Object> params = getFilmParams(film);
+        Map<String, Object> params = new HashMap<>(getFilmParams(film));
+        params.put("filmId", film.getId());
         parameter.update(sqlUpdateFilm, params);
         parameter.update(sqlDeleteGenresFilm, Map.of("filmId", film.getId()));
         updateGenre(film);
@@ -183,26 +179,25 @@ public class FilmStorageDbImpl implements FilmStorage {
     }
 
     @Override
-    public Film putLike(Integer id, Long userId) {
+    public Film putLike(Long id, Long userId) {
         parameter.update(sqlInsertLikeFilm, Map.of("filmId", id, "userId", userId));
         return getFilmsById(id);
     }
 
     @Override
-    public Film deleteLike(Integer id, Long userId) {
+    public Film deleteLike(Long id, Long userId) {
         parameter.update(sqlDeleteLikeFilm, Map.of("filmId", id, "userId", userId));
         return getFilmsById(id);
     }
 
     @Override
-    public void deleteFilm(Integer id) {
+    public void deleteFilm(Long id) {
         parameter.update(sqlDeleteFilm, Map.of("filmId", id));
     }
 
     @Override
-    public boolean isExistsIdFilm(Integer filmId) {
-        List<Object> id = parameter.query(sqlSelectIdFilm, Map.of("filmId", filmId),
-                (rs, rowNum) -> rs.getInt("film_id"));
-        return id.size() == 1;
+    public boolean isExistsIdFilm(Long filmId) {
+        return parameter.query(sqlSelectIdFilm, Map.of("filmId", filmId),
+                (rs, rowNum) -> rs.getInt("film_id")).size() == 1;
     }
 }

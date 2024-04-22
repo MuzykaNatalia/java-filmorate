@@ -20,11 +20,10 @@ public class UserServiceImplTest {
     private UserService userService;
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;
-    private UserStorage userStorage;
 
     @BeforeEach
     public void setUp() {
-        userStorage = new UserStorageDbImpl(jdbcTemplate, parameter);
+        UserStorage userStorage = new UserStorageDbImpl(jdbcTemplate, parameter);
         userService = new UserServiceImpl(userStorage);
     }
 
@@ -41,7 +40,7 @@ public class UserServiceImplTest {
     @DisplayName("Не должен обновить пользователя с несуществующим id")
     @Test
     public void shouldNotUpdateUser() {
-        User user = new User(55,"livanova@email.ru", "liv4mar123", "Мария Ливанова",
+        User user = new User(55L,"livanova@email.ru", "liv4mar123", "Мария Ливанова",
                 LocalDate.of(1994, 9, 17));
         UserNotFoundException exception = assertThrows(
                 UserNotFoundException.class,

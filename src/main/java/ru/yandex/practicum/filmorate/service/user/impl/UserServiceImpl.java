@@ -58,6 +58,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public User createUser(User user) {
+        if (user.getId() != null) {
+            log.warn("Incorrect id={} was passed when creating the user: ", user.getId());
+            throw new ValidationException("id for the user must not be specified");
+        }
         setUserNameIfMissing(user);
         User userCreated = userStorage.createUser(user);
         log.info("Create user {}", userCreated);

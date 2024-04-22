@@ -7,7 +7,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.*;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import java.util.*;
@@ -21,7 +20,7 @@ public class FilmController {
     private final FilmService filmService;
 
     @GetMapping("/{id}")
-    public Film getFilmById(@PathVariable @NotNull @Min(1) Integer id) {
+    public Film getFilmById(@PathVariable @NotNull @Min(1) Long id) {
         return filmService.getFilmById(id);
     }
 
@@ -38,10 +37,6 @@ public class FilmController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public Film createFilm(@Valid @RequestBody Film film) {
-        if (film.getId() != 0) {
-            log.warn("Incorrect id={} was passed when creating the film: ", film.getId());
-            throw new ValidationException("id for the film must not be specified");
-        }
         return filmService.createFilm(film);
     }
 
@@ -51,17 +46,17 @@ public class FilmController {
     }
 
     @PutMapping("/{id}/like/{userId}")
-    public Film putLike(@PathVariable @NotNull @Min(1) Integer id, @PathVariable @NotNull @Min(1) Long userId) {
+    public Film putLike(@PathVariable @NotNull @Min(1) Long id, @PathVariable @NotNull @Min(1) Long userId) {
         return filmService.putLike(id, userId);
     }
 
     @DeleteMapping("/{id}/like/{userId}")
-    public Film deleteLike(@PathVariable @NotNull @Min(1) Integer id, @PathVariable @NotNull @Min(1) Long userId) {
+    public Film deleteLike(@PathVariable @NotNull @Min(1) Long id, @PathVariable @NotNull @Min(1) Long userId) {
         return filmService.deleteLike(id, userId);
     }
 
     @DeleteMapping("/{id}")
-    public String deleteFilm(@PathVariable @NotNull @Min(1) Integer id) {
+    public String deleteFilm(@PathVariable @NotNull @Min(1) Long id) {
         return filmService.deleteFilm(id);
     }
 }
