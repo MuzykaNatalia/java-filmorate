@@ -11,7 +11,7 @@ import java.util.*;
 @RequiredArgsConstructor
 @AllArgsConstructor
 public class User {
-    private long id;
+    private Long id;
     @NotBlank
     @Email
     private String email;

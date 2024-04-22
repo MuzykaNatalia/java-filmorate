@@ -18,7 +18,7 @@ public class FilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
 
     @Override
-    public Film getFilmById(Integer id) {
+    public Film getFilmById(Long id) {
         Film film = filmStorage.getFilmsById(id);
         if (film == null) {
             log.warn("Film with id={} not found", id);
@@ -73,6 +73,10 @@ public class FilmServiceImpl implements FilmService {
 
     @Override
     public Film createFilm(Film film) {
+        if (film.getId() != null) {
+            log.warn("Incorrect id={} was passed when creating the film: ", film.getId());
+            throw new ValidationException("id for the film must not be specified");
+        }
         isExistsRatingMpa(film);
         isExistsGenres(film);
         Film filmCreated = filmStorage.createFilm(film);
@@ -110,7 +114,7 @@ public class FilmServiceImpl implements FilmService {
         return filmUpdated;
     }
 
-    private void isExistsIdFilm(Integer filmId) {
+    private void isExistsIdFilm(Long filmId) {
         boolean isExists = filmStorage.isExistsIdFilm(filmId);
         if (!isExists) {
             log.warn("Film with id={} not found", filmId);
@@ -119,21 +123,21 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public Film putLike(Integer id, Long userId) {
+    public Film putLike(Long id, Long userId) {
         isExistsIdFilm(id);
         log.info("User userId={} liked the film id={}", userId, id);
         return filmStorage.putLike(id, userId);
     }
 
     @Override
-    public Film deleteLike(Integer id, Long userId) {
+    public Film deleteLike(Long id, Long userId) {
         isExistsIdFilm(id);
         log.info("User id={} removed the like from the film id={}", userId, id);
         return filmStorage.deleteLike(id, userId);
     }
 
     @Override
-    public String deleteFilm(Integer id) {
+    public String deleteFilm(Long id) {
         isExistsIdFilm(id);
         filmStorage.deleteFilm(id);
         log.info("Film with id={} deleted", id);

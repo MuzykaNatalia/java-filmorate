@@ -39,7 +39,7 @@ public class UserStorageDbImplTest {
     @Test
     public void shouldCreateUser() {
         User user3 = new User(1L, "petrov@email.ru", "vanya123", "Иван Петров",
-                LocalDate.of(1990, 1, 1), new HashSet<>());
+                LocalDate.of(1990, 1, 1));
         userStorage.createUser(user1);
 
         User result = userStorage.getUserById(1L);
@@ -53,7 +53,7 @@ public class UserStorageDbImplTest {
     @Test
     public void shouldUpdateUser() {
         User userForUpdate = new User(1L, "petrovIvan@email.ru", "vanya789",
-                "Иван Петров Александрович", LocalDate.of(1991, 2, 2), new HashSet<>());
+                "Иван Петров Александрович", LocalDate.of(1991, 2, 2));
         userStorage.createUser(user1);
         userStorage.updateUser(userForUpdate);
 
@@ -68,7 +68,7 @@ public class UserStorageDbImplTest {
     @Test
     public void shouldReturnUserById() {
         User user3 = new User(1L, "petrov@email.ru", "vanya123", "Иван Петров",
-                LocalDate.of(1990, 1, 1), new HashSet<>());
+                LocalDate.of(1990, 1, 1));
         userStorage.createUser(user1);
 
         User result1 = userStorage.getUserById(1L);
@@ -85,12 +85,12 @@ public class UserStorageDbImplTest {
     @DisplayName("Должен вернуть всех пользователей")
     @Test
     public void shouldReturnAllUsers() {
-        List<User> users = List.of(new User(1,"petrov@email.ru", "vanya123", "Иван Петров",
-                        LocalDate.of(1990, 1, 1), new HashSet<>()),
-                new User(2,"livanova@email.ru", "liv4mar123", "Мария Ливанова",
-                        LocalDate.of(1994, 9, 17), new HashSet<>()),
-                new User(3,"nikitin@email.ru", "sr4nik123", "Сергей Никитин",
-                        LocalDate.of(2000, 12, 24), new HashSet<>()));
+        List<User> users = List.of(new User(1L,"petrov@email.ru", "vanya123", "Иван Петров",
+                        LocalDate.of(1990, 1, 1)),
+                new User(2L,"livanova@email.ru", "liv4mar123", "Мария Ливанова",
+                        LocalDate.of(1994, 9, 17)),
+                new User(3L,"nikitin@email.ru", "sr4nik123", "Сергей Никитин",
+                        LocalDate.of(2000, 12, 24)));
 
         Collection<User> result1 = userStorage.getAllUsers();
         assertThat(result1)
@@ -110,8 +110,8 @@ public class UserStorageDbImplTest {
     @DisplayName("Должен вернуть всех друзей пользователя с id = 1")
     @Test
     public void shouldReturnAllFriendsUser() {
-        List<User> users = List.of(new User(3,"nikitin@email.ru", "sr4nik123", "Сергей Никитин",
-                LocalDate.of(2000, 12, 24), new HashSet<>()));
+        List<User> users = List.of(new User(3L,"nikitin@email.ru", "sr4nik123", "Сергей Никитин",
+                LocalDate.of(2000, 12, 24)));
 
         userStorage.createUser(user1);
         userStorage.createUser(user2);
@@ -128,8 +128,8 @@ public class UserStorageDbImplTest {
     @DisplayName("Должен вернуть общих друзей пользователя с id = 1 и пользователя с id = 3")
     @Test
     public void shouldReturnUsersMutualFriends() {
-        List<User> users = List.of(new User(2,"livanova@email.ru", "liv4mar123", "Мария Ливанова",
-                LocalDate.of(1994, 9, 17), new HashSet<>()));
+        List<User> users = List.of(new User(2L,"livanova@email.ru", "liv4mar123", "Мария Ливанова",
+                LocalDate.of(1994, 9, 17)));
 
         userStorage.createUser(user1);
         userStorage.createUser(user2);
@@ -143,20 +143,6 @@ public class UserStorageDbImplTest {
                 .isNotNull()
                 .usingRecursiveComparison()
                 .isEqualTo(users);
-    }
-
-    @DisplayName("Должен добавить пользователя с id = 2 в друзья пользователю с id = 1")
-    @Test
-    public void shouldAddInFriend() {
-        User user = new User(1L, "petrov@email.ru", "vanya123", "Иван Петров",
-                LocalDate.of(1990, 1, 1), Set.of(2L));
-        userStorage.createUser(user1);
-        userStorage.createUser(user2);
-
-        User result = userStorage.addInFriend(1L, 2L);
-        assertThat(result)
-                .isNotNull()
-                .isEqualTo(user);
     }
 
     @DisplayName("Должен удалить пользователя с id = 1")
