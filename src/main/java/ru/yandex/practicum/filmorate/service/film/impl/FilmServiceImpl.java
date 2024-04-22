@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.dao.film.FilmStorage;
+import ru.yandex.practicum.filmorate.service.genre.GenreService;
+import ru.yandex.practicum.filmorate.service.rating.RatingMpaService;
 import java.util.Collection;
 
 @Service
@@ -16,6 +18,8 @@ import java.util.Collection;
 @Primary
 public class FilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
+    private final GenreService genreService;
+    private final RatingMpaService ratingMpaService;
 
     @Override
     public Film getFilmById(Long id) {
@@ -40,38 +44,6 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public Collection<Genre> getAllGenres() {
-        log.info("Received all genres");
-        return filmStorage.getAllGenres();
-    }
-
-    @Override
-    public Genre getGenreById(Integer id) {
-        Genre genre = filmStorage.getGenreById(id);
-        if (genre == null) {
-            log.warn("Genre with id={} not found", id);
-            throw new NotFoundException(String.format("Genre with id=%d not found", id));
-        }
-        return genre;
-    }
-
-    @Override
-    public Collection<RatingMpa> getAllMpa() {
-        log.info("Received all ratings mpa");
-        return filmStorage.getAllMpa();
-    }
-
-    @Override
-    public RatingMpa getMpaById(Integer id) {
-        RatingMpa mpa = filmStorage.getMpaById(id);
-        if (mpa == null) {
-            log.warn("Rating MPA with id={} not found", id);
-            throw new NotFoundException(String.format("Rating MPA with id=%d not found", id));
-        }
-        return mpa;
-    }
-
-    @Override
     public Film createFilm(Film film) {
         if (film.getId() != null) {
             log.warn("Incorrect id={} was passed when creating the film: ", film.getId());
@@ -85,8 +57,8 @@ public class FilmServiceImpl implements FilmService {
     }
 
     private void isExistsRatingMpa(Film film) {
-        RatingMpa mpa = filmStorage.getMpaById(film.getMpa().getId());
-        if (mpa == null) {
+        boolean mpa = ratingMpaService.isExistsRatingMpa(film.getMpa().getId());
+        if (!mpa) {
             log.warn("Rating MPA with id={} not already exist", film.getMpa().getId());
             throw new ValidationException(String.format(
                     "Rating MPA with id=%d not already exist", film.getMpa().getId()));
@@ -95,8 +67,8 @@ public class FilmServiceImpl implements FilmService {
 
     private void isExistsGenres(Film film) {
         film.getGenres().forEach(genreFilm -> {
-            Genre genre = filmStorage.getGenreById(genreFilm.getId());
-            if (genre == null) {
+            boolean genre = genreService.isExistsGenres(genreFilm.getId());
+            if (!genre) {
                 log.warn("Genre with id={} not already exist", genreFilm.getId());
                 throw new ValidationException(String.format(
                         "Genre with id=%d not already exist", genreFilm.getId()));

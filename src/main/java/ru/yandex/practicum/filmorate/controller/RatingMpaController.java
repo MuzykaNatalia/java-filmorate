@@ -5,7 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.RatingMpa;
-import ru.yandex.practicum.filmorate.service.film.FilmService;
+import ru.yandex.practicum.filmorate.service.rating.RatingMpaService;
 import javax.validation.constraints.*;
 import java.util.Collection;
 
@@ -15,15 +15,15 @@ import java.util.Collection;
 @Slf4j
 @RequestMapping("/mpa")
 public class RatingMpaController {
-    private final FilmService filmService;
-
-    @GetMapping
-    public Collection<RatingMpa> getAllMpa() {
-        return filmService.getAllMpa();
-    }
+    private final RatingMpaService ratingMpaService;
 
     @GetMapping("/{id}")
     public RatingMpa getMpaById(@PathVariable @NotNull @Min(1) Integer id) {
-        return filmService.getMpaById(id);
+        return ratingMpaService.getMpaById(id);
+    }
+
+    @GetMapping
+    public Collection<RatingMpa> getAllMpa() {
+        return ratingMpaService.getAllMpa();
     }
 }

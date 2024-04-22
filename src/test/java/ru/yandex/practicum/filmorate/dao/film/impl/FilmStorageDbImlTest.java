@@ -107,60 +107,6 @@ public class FilmStorageDbImlTest {
                 .isNull();
     }
 
-    @DisplayName("Должен вернуть жанр по id")
-    @Test
-    public void shouldReturnGenreById() {
-        Genre genre = new Genre(3, "Мультфильм");
-
-        Genre result = filmStorage.getGenreById(3);
-        assertThat(result)
-                .isNotNull()
-                .usingRecursiveComparison()
-                .isEqualTo(genre);
-    }
-
-    @DisplayName("Должен вернуть рейтинг MPA по id")
-    @Test
-    public void shouldReturnRatingMpaById() {
-        RatingMpa rating = new RatingMpa(2, "PG");
-
-        RatingMpa result = filmStorage.getMpaById(2);
-        assertThat(result)
-                .isNotNull()
-                .usingRecursiveComparison()
-                .isEqualTo(rating);
-    }
-
-    @DisplayName("Должен вернуть все жанры")
-    @Test
-    public void shouldReturnAllGenres() {
-        List<Genre> genres = List.of(
-                new Genre(1, "Комедия"), new Genre(2, "Драма"),
-                new Genre(3, "Мультфильм"), new Genre(4, "Триллер"),
-                new Genre(5, "Документальный"), new Genre(6, "Боевик"));
-
-        Collection<Genre> result = filmStorage.getAllGenres();
-        assertThat(result)
-                .isNotNull()
-                .usingRecursiveComparison()
-                .isEqualTo(genres);
-    }
-
-    @DisplayName("Должен вернуть все рейтинги MPA")
-    @Test
-    public void shouldReturnAllRatingsMpa() {
-        List<RatingMpa> ratings = List.of(
-                new RatingMpa(1, "G"), new RatingMpa(2, "PG"),
-                new RatingMpa(3, "PG-13"), new RatingMpa(4, "R"),
-                new RatingMpa(5, "NC-17"));
-
-        Collection<RatingMpa> result = filmStorage.getAllMpa();
-        assertThat(result)
-                .isNotNull()
-                .usingRecursiveComparison()
-                .isEqualTo(ratings);
-    }
-
     @DisplayName("Должен вернуть все фильмы")
     @Test
     public void shouldReturnAllFilms() {
