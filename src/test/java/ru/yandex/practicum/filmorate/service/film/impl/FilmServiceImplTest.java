@@ -27,7 +27,7 @@ public class FilmServiceImplTest {
     @BeforeEach
     public void setUp() {
         filmService = new FilmServiceImpl(filmStorage, genreService, ratingMpaService);
-        film1 = new Film("555", "555", LocalDate.of(2010, 11, 15), 70,
+        film1 = new Film(null, "555", "555", LocalDate.of(2010, 11, 15), 70,
                 new RatingMpa(1, "G"), List.of(new Genre(1, "Комедия")));
     }
 

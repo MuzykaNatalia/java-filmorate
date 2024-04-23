@@ -35,23 +35,23 @@ public class FilmStorageDbImlTest {
     public void setUp() {
         filmStorage = new FilmStorageDbImpl(jdbcTemplate, parameter);
         userStorage = new UserStorageDbImpl(jdbcTemplate, parameter);
-        film1 = new Film("8 миля", "Джимми Смит",
+        film1 = new Film(null,"8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110,
                 new RatingMpa(5, "NC-17"), List.of(new Genre(1, "Комедия")));
-        film2 = new Film("Собака киборг", "Собака спасает мир от инопланетян",
+        film2 = new Film(null, "Собака киборг", "Собака спасает мир от инопланетян",
                 LocalDate.of(2007, 9, 1), 60,
                 new RatingMpa(2, "PG"), List.of(new Genre(6, "Боевик")));
-        film3 = new Film("Веселые ребята", "Трое друзей отправляются в путешествие",
+        film3 = new Film(null, "Веселые ребята", "Трое друзей отправляются в путешествие",
                 LocalDate.of(2013, 4, 26), 80,
                 new RatingMpa(3, "PG-13"), List.of(new Genre(1, "Комедия")));
-        film4 = new Film("Хитрый лис", "Сказка о лисенке",
+        film4 = new Film(null, "Хитрый лис", "Сказка о лисенке",
                 LocalDate.of(2010, 7, 3), 70, new RatingMpa(1, "G"),
                 List.of(new Genre(3, "Мультфильм"), new Genre(1, "Комедия")));
-        user1 = new User("petrov@email.ru", "vanya123", "Иван Петров",
+        user1 = new User(null, "petrov@email.ru", "vanya123", "Иван Петров",
                 LocalDate.of(1990, 1, 1));
-        user2 = new User("livanova@email.ru", "liv4mar123", "Мария Ливанова",
+        user2 = new User(null, "livanova@email.ru", "liv4mar123", "Мария Ливанова",
                 LocalDate.of(1994, 9, 17));
-        user3 = new User("nikitin@email.ru", "sr4nik123", "Сергей Никитин",
+        user3 = new User(null, "nikitin@email.ru", "sr4nik123", "Сергей Никитин",
                 LocalDate.of(2000, 12, 24));
     }
 

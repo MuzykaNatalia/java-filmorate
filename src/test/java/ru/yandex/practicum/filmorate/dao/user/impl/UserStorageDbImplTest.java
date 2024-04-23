@@ -27,11 +27,11 @@ public class UserStorageDbImplTest {
     @BeforeEach
     public void setUp() {
         userStorage = new UserStorageDbImpl(jdbcTemplate, parameter);
-        user1 = new User("petrov@email.ru", "vanya123", "Иван Петров",
+        user1 = new User(null, "petrov@email.ru", "vanya123", "Иван Петров",
                 LocalDate.of(1990, 1, 1));
-        user2 = new User("livanova@email.ru", "liv4mar123", "Мария Ливанова",
+        user2 = new User(null, "livanova@email.ru", "liv4mar123", "Мария Ливанова",
                 LocalDate.of(1994, 9, 17));
-        user3 = new User("nikitin@email.ru", "sr4nik123", "Сергей Никитин",
+        user3 = new User(null, "nikitin@email.ru", "sr4nik123", "Сергей Никитин",
                 LocalDate.of(2000, 12, 24));
     }
 
