@@ -17,28 +17,27 @@ import java.util.*;
 public class UserStorageDbImpl implements UserStorage {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcOperations parameter;
-    protected final String sqlSelectOneUser = "SELECT * FROM users WHERE user_id = :userId";
-    protected final String sqlSelectAllUser = "SELECT * FROM users";
-    protected final String sqlSelectFriendsOneUser = "SELECT * FROM users " +
-            "WHERE user_id IN " +
-            "(SELECT friend_id FROM friendship " +
-            "WHERE user_id = :userId)";
-    protected final String sqlSelectMutualFriends = "SELECT * FROM users " +
-            "WHERE user_id IN " +
-            "(SELECT friend_id FROM friendship " +
-            "WHERE user_id = :userId OR user_id = :otherId " +
-            "GROUP BY friend_id " +
-            "HAVING COUNT(friend_id) > 1)";
-    protected final String sqlInsertInFriends = "INSERT INTO friendship VALUES (:userId, :friendId, true)";
+    protected final String sqlSelectOneUser = "SELECT * FROM users WHERE user_id = :userId;";
     protected final String sqlUpdateUser = "UPDATE users SET email = :email, " +
             "login = :login, name = :name,  birthday = :birthday " +
-            "WHERE user_id = :userId";
-    protected final String sqlDeleteUser = "DELETE FROM users WHERE user_id = :userId";
+            "WHERE user_id = :userId;";
+    protected final String sqlDeleteUser = "DELETE FROM users WHERE user_id = :userId;";
+    protected final String sqlSelectIdUser = "SELECT user_id FROM users WHERE user_id = :userId;";
+    protected final String sqlSelectAllUser = "SELECT * FROM users;";
+    protected final String sqlInsertInFriends = "INSERT INTO friendship VALUES (:userId, :friendId, true);";
     protected final String sqlDeleteFromFriends = "DELETE FROM friendship " +
-            "WHERE user_id = :userId AND friend_id = :friendId";
-    protected final String sqlSelectIdUser = "SELECT user_id FROM users WHERE user_id = :userId";
+            "WHERE user_id = :userId AND friend_id = :friendId;";
     protected final String sqlSelectIdUserElseFriendship = "SELECT user_id FROM friendship " +
-            "WHERE user_id = :userId AND friend_id = :friendId";
+            "WHERE user_id = :userId AND friend_id = :friendId;";
+    protected final String sqlSelectFriendsOneUser = "SELECT u.* FROM users AS u " +
+            "JOIN friendship AS f ON u.user_id = f.friend_id " +
+            "WHERE f.user_id = :userId;";
+    protected final String sqlSelectMutualFriends = "SELECT u.* FROM users AS u " +
+            "JOIN (SELECT friend_id " +
+            "FROM friendship " +
+            "WHERE user_id = :userId OR user_id = :otherId " +
+            "GROUP BY friend_id " +
+            "HAVING COUNT(*) > 1) AS common_friends ON u.user_id = common_friends.friend_id;";
 
     @Override
     public User getUserById(Long id) {
@@ -91,11 +90,6 @@ public class UserStorageDbImpl implements UserStorage {
         return getUserById(user.getId());
     }
 
-    private Map<String, Object> getUserParams(User user) {
-        return Map.of("email", user.getEmail(), "login", user.getLogin(), "name", user.getName(),
-                "birthday", user.getBirthday(), "userId", user.getId());
-    }
-
     @Override
     public void deleteUser(Long id) {
         parameter.update(sqlDeleteUser, Map.of("userId", id));
@@ -108,19 +102,18 @@ public class UserStorageDbImpl implements UserStorage {
 
     @Override
     public boolean isExistsIdUser(Long userId) {
-        List<Integer> id = parameter.query(
-                sqlSelectIdUser, Map.of("userId", userId),
-                (rs, rowNum) -> rs.getInt("user_id"));
-
-        return id.size() == 1;
+        return parameter.query(sqlSelectIdUser, Map.of("userId", userId),
+                (rs, rowNum) -> rs.getInt("user_id")).size() > 0;
     }
 
     @Override
     public boolean isExistsFriendship(Long userId, Long friendId) {
-       List<Integer> id = parameter.query(sqlSelectIdUserElseFriendship,
-               Map.of("userId", userId, "friendId", friendId),
-               (rs, rowNum) -> rs.getInt("user_id"));
+        return parameter.query(sqlSelectIdUserElseFriendship, Map.of("userId", userId, "friendId", friendId),
+               (rs, rowNum) -> rs.getInt("user_id")).size() > 0;
+    }
 
-        return id.size() == 1;
+    private Map<String, Object> getUserParams(User user) {
+        return Map.of("email", user.getEmail(), "login", user.getLogin(), "name", user.getName(),
+                "birthday", user.getBirthday(), "userId", user.getId());
     }
 }

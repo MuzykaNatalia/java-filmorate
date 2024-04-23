@@ -23,7 +23,7 @@ public class UserValidationTest {
     @DisplayName("Должен создать пользователя")
     @Test
     public void shouldCreateUser() throws Exception {
-        User user = new User("monika@yandex.ru", "jnb6fds", "Monika",
+        User user = new User(null, "monika@yandex.ru", "jnb6fds", "Monika",
                 LocalDate.of(1989, 1, 19));
         mockMvc.perform(post("/users")
                         .content(objectMapper.writeValueAsString(user))
@@ -39,7 +39,7 @@ public class UserValidationTest {
     @DisplayName("Должен изменить пустое имя пользователя на логин")
     @Test
     public void shouldChangeTheEmptyNameToLogin() throws Exception {
-        User user = new User("mama@yandex.ru", "a2sfg2hjk", "",
+        User user = new User(null, "mama@yandex.ru", "a2sfg2hjk", "",
                 LocalDate.of(2000, 12, 15));
         mockMvc.perform(post("/users")
                         .content(objectMapper.writeValueAsString(user))
@@ -55,7 +55,7 @@ public class UserValidationTest {
     @DisplayName("Должен изменить состоящее из одних пробелов имя пользователя на логин")
     @Test
     public void shouldChangeTheBlankNameToLogin() throws Exception {
-        User user = new User("papa@yandex.ru", "jh9gvc", "         ",
+        User user = new User(null, "papa@yandex.ru", "jh9gvc", "         ",
                 LocalDate.of(1999, 11, 14));
         mockMvc.perform(post("/users")
                         .content(objectMapper.writeValueAsString(user))
@@ -71,7 +71,7 @@ public class UserValidationTest {
     @DisplayName("Должен изменить null имя пользователя на логин")
     @Test
     public void shouldChangeTheNullNameToLogin() throws Exception {
-        User user = new User("lola@yandex.ru", "lmn8bvc", null,
+        User user = new User(null, "lola@yandex.ru", "lmn8bvc", null,
                 LocalDate.of(1998, 10, 13));
         mockMvc.perform(post("/users")
                         .content(objectMapper.writeValueAsString(user))
@@ -87,7 +87,7 @@ public class UserValidationTest {
     @DisplayName("Должен вернуть код ошибки 400 при наличии в логине пользователя пробела")
     @Test
     public void shouldReturnAnErrorCode400ForALoginContainingASpace() throws Exception {
-        User user = new User("a@yandex.ru", "k k", "Anita",
+        User user = new User(null, "a@yandex.ru", "k k", "Anita",
                 LocalDate.of(2000, 12, 15));
         mockMvc.perform(post("/users")
                         .content(objectMapper.writeValueAsString(user))
@@ -98,7 +98,7 @@ public class UserValidationTest {
     @DisplayName("Должен вернуть код ошибки 400 при пустом логине пользователя")
     @Test
     public void shouldReturnAnErrorCode400AnEmptyLogin() throws Exception {
-        User user = new User("nana@yandex.ru", "", "Nana",
+        User user = new User(null, "nana@yandex.ru", "", "Nana",
                 LocalDate.of(1996, 8, 11));
         mockMvc.perform(post("/users")
                         .content(objectMapper.writeValueAsString(user))
@@ -109,7 +109,7 @@ public class UserValidationTest {
     @DisplayName("Должен вернуть код ошибки 400, дата рождения пользователя указана будущим временем")
     @Test
     public void shouldReturnAnErrorCode400ForUserBirthdayTheFuture() throws Exception {
-        User user = new User("han@yandex.ru", "asd9ewq", "Han",
+        User user = new User(null, "han@yandex.ru", "asd9ewq", "Han",
                 LocalDate.of(500000, 12, 15));
         mockMvc.perform(post("/users")
                         .content(objectMapper.writeValueAsString(user))
@@ -120,7 +120,7 @@ public class UserValidationTest {
     @DisplayName("Должен вернуть код ошибки 400 для неправильно сформированного адреса электронной почты")
     @Test
     public void shouldReturnAnErrorCode400ForInvalidEmail() throws Exception {
-        User user = new User("yandex", "gbn3hjk", "Luna",
+        User user = new User(null, "yandex", "gbn3hjk", "Luna",
                 LocalDate.of(1989, 9, 3));
         mockMvc.perform(post("/users")
                         .content(objectMapper.writeValueAsString(user))

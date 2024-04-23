@@ -35,36 +35,36 @@ public class FilmStorageDbImlTest {
     public void setUp() {
         filmStorage = new FilmStorageDbImpl(jdbcTemplate, parameter);
         userStorage = new UserStorageDbImpl(jdbcTemplate, parameter);
-        film1 = new Film("8 миля", "Джимми Смит",
+        film1 = new Film(null,"8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110,
                 new RatingMpa(5, "NC-17"), List.of(new Genre(1, "Комедия")));
-        film2 = new Film("Собака киборг", "Собака спасает мир от инопланетян",
+        film2 = new Film(null, "Собака киборг", "Собака спасает мир от инопланетян",
                 LocalDate.of(2007, 9, 1), 60,
                 new RatingMpa(2, "PG"), List.of(new Genre(6, "Боевик")));
-        film3 = new Film("Веселые ребята", "Трое друзей отправляются в путешествие",
+        film3 = new Film(null, "Веселые ребята", "Трое друзей отправляются в путешествие",
                 LocalDate.of(2013, 4, 26), 80,
                 new RatingMpa(3, "PG-13"), List.of(new Genre(1, "Комедия")));
-        film4 = new Film("Хитрый лис", "Сказка о лисенке",
+        film4 = new Film(null, "Хитрый лис", "Сказка о лисенке",
                 LocalDate.of(2010, 7, 3), 70, new RatingMpa(1, "G"),
                 List.of(new Genre(3, "Мультфильм"), new Genre(1, "Комедия")));
-        user1 = new User("petrov@email.ru", "vanya123", "Иван Петров",
+        user1 = new User(null, "petrov@email.ru", "vanya123", "Иван Петров",
                 LocalDate.of(1990, 1, 1));
-        user2 = new User("livanova@email.ru", "liv4mar123", "Мария Ливанова",
+        user2 = new User(null, "livanova@email.ru", "liv4mar123", "Мария Ливанова",
                 LocalDate.of(1994, 9, 17));
-        user3 = new User("nikitin@email.ru", "sr4nik123", "Сергей Никитин",
+        user3 = new User(null, "nikitin@email.ru", "sr4nik123", "Сергей Никитин",
                 LocalDate.of(2000, 12, 24));
     }
 
     @DisplayName("Должен создать фильм")
     @Test
     public void shouldCreateFilm() {
-        Film film = new Film(1, "8 миля", "Джимми Смит",
+        Film film = new Film(1L, "8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110,
                 new RatingMpa(5, "NC-17"),
                 List.of(new Genre(1, "Комедия")));
         filmStorage.createFilm(film1);
 
-        Film result = filmStorage.getFilmsById(1);
+        Film result = filmStorage.getFilmsById(1L);
         assertThat(result)
                 .isNotNull()
                 .usingRecursiveComparison()
@@ -74,13 +74,13 @@ public class FilmStorageDbImlTest {
     @DisplayName("Должен обновить фильм")
     @Test
     public void shouldUpdateFilm() {
-        Film filmForUpdate = new Film(1,"миля", "Смит",
+        Film filmForUpdate = new Film(1L,"миля", "Смит",
                 LocalDate.of(2003, 12, 7), 100,
                 new RatingMpa(2, "PG"), List.of(new Genre(2, "Драма")));
         filmStorage.createFilm(film1);
         filmStorage.updateFilm(filmForUpdate);
 
-        Film result = filmStorage.getFilmsById(1);
+        Film result = filmStorage.getFilmsById(1L);
         assertThat(result)
                 .isNotNull()
                 .usingRecursiveComparison()
@@ -90,75 +90,21 @@ public class FilmStorageDbImlTest {
     @DisplayName("Должен вернуть фильм по id")
     @Test
     public void shouldReturnFilmById() {
-        Film film = new Film(1, "8 миля", "Джимми Смит",
+        Film film = new Film(1L, "8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110,
                 new RatingMpa(5, "NC-17"),
                 List.of(new Genre(1, "Комедия")));
         filmStorage.createFilm(film1);
 
-        Film result1 = filmStorage.getFilmsById(1);
+        Film result1 = filmStorage.getFilmsById(1L);
         assertThat(result1)
                 .isNotNull()
                 .usingRecursiveComparison()
                 .isEqualTo(film);
 
-        Film result2 = filmStorage.getFilmsById(84);
+        Film result2 = filmStorage.getFilmsById(84L);
         assertThat(result2)
                 .isNull();
-    }
-
-    @DisplayName("Должен вернуть жанр по id")
-    @Test
-    public void shouldReturnGenreById() {
-        Genre genre = new Genre(3, "Мультфильм");
-
-        Genre result = filmStorage.getGenreById(3);
-        assertThat(result)
-                .isNotNull()
-                .usingRecursiveComparison()
-                .isEqualTo(genre);
-    }
-
-    @DisplayName("Должен вернуть рейтинг MPA по id")
-    @Test
-    public void shouldReturnRatingMpaById() {
-        RatingMpa rating = new RatingMpa(2, "PG");
-
-        RatingMpa result = filmStorage.getMpaById(2);
-        assertThat(result)
-                .isNotNull()
-                .usingRecursiveComparison()
-                .isEqualTo(rating);
-    }
-
-    @DisplayName("Должен вернуть все жанры")
-    @Test
-    public void shouldReturnAllGenres() {
-        List<Genre> genres = List.of(
-                new Genre(1, "Комедия"), new Genre(2, "Драма"),
-                new Genre(3, "Мультфильм"), new Genre(4, "Триллер"),
-                new Genre(5, "Документальный"), new Genre(6, "Боевик"));
-
-        Collection<Genre> result = filmStorage.getAllGenres();
-        assertThat(result)
-                .isNotNull()
-                .usingRecursiveComparison()
-                .isEqualTo(genres);
-    }
-
-    @DisplayName("Должен вернуть все рейтинги MPA")
-    @Test
-    public void shouldReturnAllRatingsMpa() {
-        List<RatingMpa> ratings = List.of(
-                new RatingMpa(1, "G"), new RatingMpa(2, "PG"),
-                new RatingMpa(3, "PG-13"), new RatingMpa(4, "R"),
-                new RatingMpa(5, "NC-17"));
-
-        Collection<RatingMpa> result = filmStorage.getAllMpa();
-        assertThat(result)
-                .isNotNull()
-                .usingRecursiveComparison()
-                .isEqualTo(ratings);
     }
 
     @DisplayName("Должен вернуть все фильмы")
@@ -180,10 +126,10 @@ public class FilmStorageDbImlTest {
     @DisplayName("Должен вернуть 2 популярных фильма")
     @Test
     void shouldReturnPopularFilms() {
-        Film filmResult1 = new Film(1, "8 миля", "Джимми Смит",
+        Film filmResult1 = new Film(1L, "8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110,
                 new RatingMpa(5, "NC-17"), List.of(new Genre(1, "Комедия")));
-        Film filmResult3 = new Film(3, "Веселые ребята", "Трое друзей отправляются в путешествие",
+        Film filmResult3 = new Film(3L, "Веселые ребята", "Трое друзей отправляются в путешествие",
                 LocalDate.of(2013, 4, 26), 80,
                 new RatingMpa(3, "PG-13"), List.of(new Genre(1, "Комедия")));
         List<Film> films = List.of(filmResult3, filmResult1);
@@ -196,12 +142,12 @@ public class FilmStorageDbImlTest {
         userStorage.createUser(user2);
         userStorage.createUser(user3);
 
-        filmStorage.putLike(3, 1L);
-        filmStorage.putLike(3, 2L);
-        filmStorage.putLike(3, 3L);
-        filmStorage.putLike(1, 1L);
-        filmStorage.putLike(1, 3L);
-        filmStorage.putLike(4, 2L);
+        filmStorage.putLike(3L, 1L);
+        filmStorage.putLike(3L, 2L);
+        filmStorage.putLike(3L, 3L);
+        filmStorage.putLike(1L, 1L);
+        filmStorage.putLike(1L, 3L);
+        filmStorage.putLike(4L, 2L);
 
         Collection<Film> result = filmStorage.getPopularFilm(2);
         assertThat(result)
@@ -213,14 +159,14 @@ public class FilmStorageDbImlTest {
     @DisplayName("Должен добавить лайк фильму с id = 1 от пользователя с id = 1")
     @Test
     void shouldPutLikeFilm() {
-        Film film = new Film(1, "8 миля", "Джимми Смит",
+        Film film = new Film(1L, "8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110,
                 new RatingMpa(5, "NC-17"), List.of(new Genre(1, "Комедия")));
 
         filmStorage.createFilm(film1);
         userStorage.createUser(user1);
 
-        Film result = filmStorage.putLike(1, 1L);
+        Film result = filmStorage.putLike(1L, 1L);
         assertThat(result)
                 .isNotNull()
                 .usingRecursiveComparison()
@@ -230,17 +176,17 @@ public class FilmStorageDbImlTest {
     @DisplayName("Должен удалить лайк фильму с id = 1 от пользователя с id = 1")
     @Test
     void shouldDeleteLikeFilm() {
-        Film film = new Film(1, "8 миля", "Джимми Смит",
+        Film film = new Film(1L, "8 миля", "Джимми Смит",
                 LocalDate.of(2002, 11, 6), 110,
                 new RatingMpa(5, "NC-17"), List.of(new Genre(1, "Комедия")));
 
         filmStorage.createFilm(film1);
         userStorage.createUser(user1);
         userStorage.createUser(user2);
-        filmStorage.putLike(1, 1L);
-        filmStorage.putLike(1, 2L);
+        filmStorage.putLike(1L, 1L);
+        filmStorage.putLike(1L, 2L);
 
-        Film result = filmStorage.deleteLike(1, 1L);
+        Film result = filmStorage.deleteLike(1L, 1L);
         assertThat(result)
                 .isNotNull()
                 .usingRecursiveComparison()
@@ -253,7 +199,7 @@ public class FilmStorageDbImlTest {
         List<Film> films = List.of(film2);
         filmStorage.createFilm(film1);
         filmStorage.createFilm(film2);
-        filmStorage.deleteFilm(1);
+        filmStorage.deleteFilm(1L);
 
         Collection<Film> result = filmStorage.getAllFilms();
         assertThat(result)
@@ -268,15 +214,14 @@ public class FilmStorageDbImlTest {
         filmStorage.createFilm(film1);
         filmStorage.createFilm(film2);
 
-        boolean resultFirst = filmStorage.isExistsIdFilm(1);
+        boolean resultFirst = filmStorage.isExistsIdFilm(1L);
         assertThat(resultFirst)
                 .isNotNull()
                 .isEqualTo(true);
 
-        boolean resultSecond = filmStorage.isExistsIdFilm(358);
+        boolean resultSecond = filmStorage.isExistsIdFilm(358L);
         assertThat(resultSecond)
                 .isNotNull()
                 .isEqualTo(false);
-
     }
 }

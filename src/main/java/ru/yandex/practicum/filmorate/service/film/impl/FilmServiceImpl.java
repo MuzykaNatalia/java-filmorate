@@ -8,6 +8,8 @@ import ru.yandex.practicum.filmorate.exception.*;
 import ru.yandex.practicum.filmorate.model.*;
 import ru.yandex.practicum.filmorate.service.film.FilmService;
 import ru.yandex.practicum.filmorate.dao.film.FilmStorage;
+import ru.yandex.practicum.filmorate.service.genre.GenreService;
+import ru.yandex.practicum.filmorate.service.rating.RatingMpaService;
 import java.util.Collection;
 
 @Service
@@ -16,9 +18,11 @@ import java.util.Collection;
 @Primary
 public class FilmServiceImpl implements FilmService {
     private final FilmStorage filmStorage;
+    private final GenreService genreService;
+    private final RatingMpaService ratingMpaService;
 
     @Override
-    public Film getFilmById(Integer id) {
+    public Film getFilmById(Long id) {
         Film film = filmStorage.getFilmsById(id);
         if (film == null) {
             log.warn("Film with id={} not found", id);
@@ -40,77 +44,32 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public Collection<Genre> getAllGenres() {
-        log.info("Received all genres");
-        return filmStorage.getAllGenres();
-    }
-
-    @Override
-    public Genre getGenreById(Integer id) {
-        Genre genre = filmStorage.getGenreById(id);
-        if (genre == null) {
-            log.warn("Genre with id={} not found", id);
-            throw new NotFoundException(String.format("Genre with id=%d not found", id));
-        }
-        return genre;
-    }
-
-    @Override
-    public Collection<RatingMpa> getAllMpa() {
-        log.info("Received all ratings mpa");
-        return filmStorage.getAllMpa();
-    }
-
-    @Override
-    public RatingMpa getMpaById(Integer id) {
-        RatingMpa mpa = filmStorage.getMpaById(id);
-        if (mpa == null) {
-            log.warn("Rating MPA with id={} not found", id);
-            throw new NotFoundException(String.format("Rating MPA with id=%d not found", id));
-        }
-        return mpa;
-    }
-
-    @Override
     public Film createFilm(Film film) {
-        isExistsRatingMpa(film);
-        isExistsGenres(film);
+        if (film.getId() != null) {
+            log.warn("Incorrect id={} was passed when creating the film: ", film.getId());
+            throw new ValidationException("id for the film must not be specified");
+        }
+        isExistsGenresAndRating(film);
         Film filmCreated = filmStorage.createFilm(film);
         log.info("Create film {}", filmCreated);
         return filmCreated;
     }
 
-    private void isExistsRatingMpa(Film film) {
-        RatingMpa mpa = filmStorage.getMpaById(film.getMpa().getId());
-        if (mpa == null) {
-            log.warn("Rating MPA with id={} not already exist", film.getMpa().getId());
-            throw new ValidationException(String.format(
-                    "Rating MPA with id=%d not already exist", film.getMpa().getId()));
-        }
-    }
-
-    private void isExistsGenres(Film film) {
-        film.getGenres().forEach(genreFilm -> {
-            Genre genre = filmStorage.getGenreById(genreFilm.getId());
-            if (genre == null) {
-                log.warn("Genre with id={} not already exist", genreFilm.getId());
-                throw new ValidationException(String.format(
-                        "Genre with id=%d not already exist", genreFilm.getId()));
-            }
-        });
+    private void isExistsGenresAndRating(Film film) {
+        ratingMpaService.isExistsRatingMpa(film.getMpa().getId());
+        film.getGenres().forEach(genreFilm -> genreService.isExistsGenres(genreFilm.getId()));
     }
 
     @Override
     public Film updateFilm(Film film) {
         isExistsIdFilm(film.getId());
-        isExistsRatingMpa(film);
-        isExistsGenres(film);
+        isExistsGenresAndRating(film);
         Film filmUpdated = filmStorage.updateFilm(film);
         log.info("Update film {}", filmUpdated);
         return filmUpdated;
     }
 
-    private void isExistsIdFilm(Integer filmId) {
+    private void isExistsIdFilm(Long filmId) {
         boolean isExists = filmStorage.isExistsIdFilm(filmId);
         if (!isExists) {
             log.warn("Film with id={} not found", filmId);
@@ -119,21 +78,21 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public Film putLike(Integer id, Long userId) {
+    public Film putLike(Long id, Long userId) {
         isExistsIdFilm(id);
         log.info("User userId={} liked the film id={}", userId, id);
         return filmStorage.putLike(id, userId);
     }
 
     @Override
-    public Film deleteLike(Integer id, Long userId) {
+    public Film deleteLike(Long id, Long userId) {
         isExistsIdFilm(id);
         log.info("User id={} removed the like from the film id={}", userId, id);
         return filmStorage.deleteLike(id, userId);
     }
 
     @Override
-    public String deleteFilm(Integer id) {
+    public String deleteFilm(Long id) {
         isExistsIdFilm(id);
         filmStorage.deleteFilm(id);
         log.info("Film with id={} deleted", id);
