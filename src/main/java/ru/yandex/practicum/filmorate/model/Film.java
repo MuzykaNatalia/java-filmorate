@@ -25,7 +25,6 @@ public class Film {
     @Positive
     private Integer duration;
     @NotNull
-    @Positive
     private RatingMpa mpa;
     private List<Genre> genres = new ArrayList<>();
 }
