@@ -113,7 +113,6 @@ public class FilmStorageDbImpl implements FilmStorage {
         Map<String, Object> params = new HashMap<>(getFilmParams(film));
         params.put("filmId", film.getId());
         parameter.update(sqlUpdateFilm, params);
-        parameter.update(sqlDeleteGenresFilm, Map.of("filmId", film.getId()));
         updateGenre(film);
         return getFilmsById(film.getId());
     }
@@ -172,6 +171,7 @@ public class FilmStorageDbImpl implements FilmStorage {
     }
 
     private void updateGenre(Film film) {
+        parameter.update(sqlDeleteGenresFilm, Map.of("filmId", film.getId()));
         if (!film.getGenres().isEmpty()) {
             Set<Genre> genres = new HashSet<>(film.getGenres());
             genres.forEach(genre -> parameter.update(sqlInsertGenresFilm,

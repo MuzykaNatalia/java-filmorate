@@ -49,38 +49,21 @@ public class FilmServiceImpl implements FilmService {
             log.warn("Incorrect id={} was passed when creating the film: ", film.getId());
             throw new ValidationException("id for the film must not be specified");
         }
-        isExistsRatingMpa(film);
-        isExistsGenres(film);
+        isExistsGenresAndRating(film);
         Film filmCreated = filmStorage.createFilm(film);
         log.info("Create film {}", filmCreated);
         return filmCreated;
     }
 
-    private void isExistsRatingMpa(Film film) {
-        boolean mpa = ratingMpaService.isExistsRatingMpa(film.getMpa().getId());
-        if (!mpa) {
-            log.warn("Rating MPA with id={} not already exist", film.getMpa().getId());
-            throw new ValidationException(String.format(
-                    "Rating MPA with id=%d not already exist", film.getMpa().getId()));
-        }
-    }
-
-    private void isExistsGenres(Film film) {
-        film.getGenres().forEach(genreFilm -> {
-            boolean genre = genreService.isExistsGenres(genreFilm.getId());
-            if (!genre) {
-                log.warn("Genre with id={} not already exist", genreFilm.getId());
-                throw new ValidationException(String.format(
-                        "Genre with id=%d not already exist", genreFilm.getId()));
-            }
-        });
+    private void isExistsGenresAndRating(Film film) {
+        ratingMpaService.isExistsRatingMpa(film.getMpa().getId());
+        film.getGenres().forEach(genreFilm -> genreService.isExistsGenres(genreFilm.getId()));
     }
 
     @Override
     public Film updateFilm(Film film) {
         isExistsIdFilm(film.getId());
-        isExistsRatingMpa(film);
-        isExistsGenres(film);
+        isExistsGenresAndRating(film);
         Film filmUpdated = filmStorage.updateFilm(film);
         log.info("Update film {}", filmUpdated);
         return filmUpdated;

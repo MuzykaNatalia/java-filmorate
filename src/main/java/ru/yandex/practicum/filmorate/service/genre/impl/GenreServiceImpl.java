@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.genre.GenreStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.service.genre.GenreService;
 import java.util.Collection;
@@ -35,6 +36,15 @@ public class GenreServiceImpl implements GenreService {
 
     @Override
     public boolean isExistsGenres(Integer id) {
-        return genreStorage.isExistsGenres(id);
+        if (id != null) {
+            boolean genre = genreStorage.isExistsGenres(id);
+            if (!genre) {
+                log.warn("Genre with id={} not already exist", id);
+                throw new ValidationException(String.format(
+                        "Genre with id=%d not already exist", id));
+            }
+            return true;
+        }
+        return false;
     }
 }

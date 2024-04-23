@@ -25,16 +25,7 @@ public class Film {
     @Positive
     private Integer duration;
     @NotNull
+    @Positive
     private RatingMpa mpa;
     private List<Genre> genres = new ArrayList<>();
-
-    public Film(String name, String description, LocalDate releaseDate, Integer duration,
-                RatingMpa mpa, List<Genre> genres) {
-        this.name = name;
-        this.description = description;
-        this.releaseDate = releaseDate;
-        this.duration = duration;
-        this.mpa = mpa;
-        this.genres = genres;
-    }
 }

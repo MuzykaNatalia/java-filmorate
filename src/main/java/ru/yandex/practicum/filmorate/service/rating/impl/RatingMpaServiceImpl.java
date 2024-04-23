@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.dao.rating.RatingMpaStorage;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
+import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.RatingMpa;
 import ru.yandex.practicum.filmorate.service.rating.RatingMpaService;
 import java.util.Collection;
@@ -35,6 +36,15 @@ public class RatingMpaServiceImpl implements RatingMpaService {
 
     @Override
     public boolean isExistsRatingMpa(Integer id) {
-        return ratingMpaStorage.isExistsRatingMpa(id);
+        if (id != null) {
+            boolean mpa = ratingMpaStorage.isExistsRatingMpa(id);
+            if (!mpa) {
+                log.warn("Rating MPA with id={} not already exist", id);
+                throw new ValidationException(String.format(
+                        "Rating MPA with id=%d not already exist", id));
+            }
+            return true;
+        }
+        return false;
     }
 }

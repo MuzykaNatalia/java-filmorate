@@ -22,11 +22,4 @@ public class User {
     @JsonFormat(pattern = "yyyy-MM-dd")
     @Past(message = "The date of birth cannot be the future")
     private LocalDate birthday;
-
-    public User(String email, String login, String name, LocalDate birthday) {
-        this.email = email;
-        this.login = login;
-        this.name = name;
-        this.birthday = birthday;
-    }
 }

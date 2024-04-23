@@ -3,8 +3,7 @@ package ru.yandex.practicum.filmorate.mapper;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import ru.yandex.practicum.filmorate.model.Genre;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.*;
 
 public class GenreFromFilmMapper implements ResultSetExtractor<Map<Long, List<Genre>>> {
